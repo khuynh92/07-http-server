@@ -2,6 +2,8 @@
 
 # 07-HTTP-SERVER
 
+## heroku link
+`https://khoa-07-http-server.herokuapp.com/`
 ## overview
 This applcation is meant to demonstrate the use of a vanilla Javascript HTTP server that does not use any 3rd party server libraries. The application will create a talking cow that has different messages depending on the GET request. Sending a POST will write to api/cowsay.
 
