@@ -59,13 +59,35 @@ describe ('app module', () => {
   });
   
   it('handles a good post request', () => {
-    let obj = {name:'Fred'};
-    let expected = JSON.stringify(obj);
+    let obj = {text:'mooooo'};
     return superagent.post('http://localhost:3000/api/cowsay')
       .send(obj)
       .then(response => {
-        expect(response.text).toEqual(expected);
+        expect(response.text).toEqual(expect.stringContaining('{"content":"mooooo"}'));
       })
       .catch(console.err);
   });
+
+  it('handles a bad post request with no text query', () => {
+    let obj = {query:'mooooo'};
+    return superagent.post('http://localhost:3000/api/cowsay')
+      .send(obj)
+      // .then(response => null)
+      .catch(err => {
+        expect(err.status).toBe(400);
+        expect(err.response.text).toEqual(expect.stringContaining('{"ERROR":"invalid request: text query required"}'));
+      });
+  });
+
+  it('handles a 400 error with no body', () => {
+    return superagent.post('http://localhost:3000/api/cowsay')
+  
+      // .then(response => false);
+      .catch(err => {
+        expect(err.status).toBe(400);
+        expect(err.response.text).toEqual(expect.stringContaining(`{ERROR: 'invalid request: body required'}`));
+      });
+  });
+
+
 });

@@ -29,9 +29,8 @@ describe('parser module', () => {
     let req = { method:'GET', url: 'http://localhost?a=1&b=2' };
     return parser(req)
       .then( request => {
-        console.log(req);
         expect(request.url.query.a).toEqual('1');
-        expect(request.url.query.c).toEqual('2');
+        expect(request.url.query.b).toEqual('2');
       })
       .catch( console.error );
   });

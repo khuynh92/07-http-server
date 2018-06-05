@@ -5,6 +5,7 @@ module.exports = function () {
       '!__test__/**/*.spec.js',
       'index.js', 
       'index.html',
+      'public/**/*.html',
     ],
 
     tests: [

@@ -15,14 +15,11 @@ const requestHandler = (request, res) => {
         res.statusCode = 200;
         res.statusMessage = 'OK';
 
-        fs.readFile(`${root}/index.html`, (err, data) => {
-          if (err) throw err;
-          else {
-            let text = data.toString();
-            res.write( text.replace('{{cowsay}}', cowsay.say({text: 'homepage'})));
-            res.end();
-            return;
-          }
+        fs.readFile(`${root}/public/index.html`, (err, data) => {
+          let text = data.toString();
+          res.write(text.replace('{{cowsay}}', cowsay.say({ text: 'homepage' })));
+          res.end();
+          return;
         });
 
       } else if (req.method === 'GET' && req.url.pathname === '/cowsay') {
@@ -31,50 +28,43 @@ const requestHandler = (request, res) => {
         res.statusMessage = 'OK';
 
         if (req.url.query.text) {
-          fs.readFile(`${root}/index.html`, (err, data) => {
-            if (err) throw err;
-            else {
-              let text = data.toString();
-              res.write( text.replace('{{cowsay}}', cowsay.say({text: req.url.query.text})));
-              res.end();
-              return;
-            }
+          fs.readFile(`${root}/public/cowsay.html`, (err, data) => {
+            let text = data.toString();
+            res.write(text.replace('{{cowsay}}', cowsay.say({ text: req.url.query.text })));
+            res.end();
+            return;
           });
         } else {
-          fs.readFile(`${root}/index.html`, (err, data) => {
-            if (err) throw err;
-            else {
-              let text = data.toString();
-              res.write( text.replace('{{cowsay}}', cowsay.say({text: 'I need something to say!!'})));
-              res.end();
-              return;
-            }
+          fs.readFile(`${root}/public/cowsay.html`, (err, data) => {
+
+            let text = data.toString();
+            res.write(text.replace('{{cowsay}}', cowsay.say({ text: 'I need something to say!!' })));
+            res.end();
+            return;
+
           });
         }
       } else if (req.method === 'POST' && req.url.pathname === '/api/cowsay') {
 
-        res.setHeader('Content-Type', 'text/json');
-        res.statusCode = 200;
-        res.statusMessage = 'OK';
-        
         let jsonString;
 
-        if (!req.body) {
-          jsonString = {ERROR: 'invalid request: body required'};
-        } else if (!req.body.text) {
-          jsonString = {ERROR: 'invalid request: text query required'};
+        if (!req.body.text) {
+          jsonString = { ERROR: 'invalid request: text query required' };
+          res.setHeader('Content-Type', 'text/json');
+          res.statusCode = 400;
+          res.statusMessage = 'BAD';
         } else {
-          jsonString = {content: req.body.text};
+          jsonString = { content: req.body.text };
+          res.setHeader('Content-Type', 'text/json');
+          res.statusCode = 200;
+          res.statusMessage = 'OK';
         }
 
-        fs.readFile(`${root}/index.html`, (err, data) => {
-          if (err) throw err;
-          else {
-            let text = data.toString();
-            res.write(text.replace('{{cowsay}}', JSON.stringify(jsonString)));
-            res.end();
-            return;
-          }
+        fs.readFile(`${root}/public/cowsay.html`, (err, data) => {
+          let text = data.toString();
+          res.write(text.replace('{{cowsay}}', JSON.stringify(jsonString)));
+          res.end();
+          return;
         });
 
       } else {
@@ -85,10 +75,17 @@ const requestHandler = (request, res) => {
         res.end();
       }
     })
-    .catch(err => {
-      res.writeHead(500);
-      res.write(`!!ERROR:  ${err}`);
-      res.end();
+    .catch(() => {
+      res.writeHead(400);
+      fs.readFile(`${root}/public/cowsay.html`, (err, data) => {
+        let jsonString = `{ERROR: 'invalid request: body required'}`;
+
+        let text = data.toString();
+        res.write(text.replace('{{cowsay}}', JSON.stringify(jsonString)));
+
+        res.end();
+        return;
+      });
     });
 };
 
